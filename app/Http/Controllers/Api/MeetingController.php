@@ -15,10 +15,14 @@ class MeetingController extends ApiController
             return $this->error('Materi belum tersedia.', 403);
         }
 
-        $meeting->load([
-            'keywords',
-            'contentBlocks' => fn ($query) => $query->where('is_visible', true),
-        ]);
+        $contentBlocks = fn ($query) => $query
+            ->when(
+                $request->user()->role === 'student',
+                fn ($query) => $query->where('is_visible', true),
+            )
+            ->orderBy('sort_order');
+
+        $meeting->load(['keywords', 'contentBlocks' => $contentBlocks]);
 
         return $this->success(
             (new MeetingResource($meeting))->resolve($request),

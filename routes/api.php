@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\CourseController;
 use App\Http\Controllers\Api\ExamAttemptController;
 use App\Http\Controllers\Api\ExamController;
 use App\Http\Controllers\Api\MeetingController;
+use App\Http\Controllers\Api\MeetingContentBlockController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\ProgressController;
 use Illuminate\Support\Facades\Route;
@@ -37,5 +38,20 @@ Route::prefix('v1')->group(function (): void {
             [ExamAttemptController::class, 'updateAnswer'],
         );
         Route::post('/attempts/{attempt}/submit', [ExamAttemptController::class, 'submit']);
+
+        Route::middleware('content-manager')->group(function (): void {
+            Route::post(
+                '/meetings/{meeting}/content-blocks',
+                [MeetingContentBlockController::class, 'store'],
+            );
+            Route::put(
+                '/content-blocks/{contentBlock}',
+                [MeetingContentBlockController::class, 'update'],
+            );
+            Route::delete(
+                '/content-blocks/{contentBlock}',
+                [MeetingContentBlockController::class, 'destroy'],
+            );
+        });
     });
 });
